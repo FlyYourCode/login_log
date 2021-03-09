@@ -45,11 +45,6 @@ public class MainActivity extends AppCompatActivity {
         initReceiver();
     }
 
-
-
-
-
-
     private void initReceiver() {
         receiver = new DataReceiver();
         registerReceiver(receiver, new IntentFilter("sendData"));
@@ -98,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
             String ip = intent.getStringExtra("currentIp");
             if (!TextUtils.isEmpty(ip) && (tv_ip != null)) {
                 tv_ip.setText(ip);
+                Log.i("ip",ip);
             }
         }
     }
