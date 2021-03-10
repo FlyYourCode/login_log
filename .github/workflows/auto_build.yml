@@ -60,7 +60,7 @@ jobs:
           # 设置压缩文件的名称，在控制台会得到WhuHelper-debug.zip文件的下载链接
           # 下载后解压缩，里面直接可以看到app-debug.apk，没有其他东西
           name: WhuHelper-debug
-          path: app/auto_build/app-debug.apk
+          path: app/build/outputs/apk/debug/app-debug.apk
 
   deploy:
     name: Upload Release Asset
