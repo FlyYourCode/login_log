@@ -1,10 +1,15 @@
 package com.job.scheduler;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,6 +23,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.job.scheduler.util.AppUtil;
 import com.job.scheduler.util.EncryptUtil;
 import com.job.scheduler.util.NetWordUtil;
 
@@ -41,9 +47,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         tv_ip = findViewById(R.id.tv_ip);
+        getImsi();
         initListener();
         initReceiver();
     }
+
+    private void getImsi() {
+        MyApp.imsi= AppUtil.getDeviceId(this);
+        Log.i("imsi",MyApp.imsi);
+    }
+
 
     private void initReceiver() {
         receiver = new DataReceiver();

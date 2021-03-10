@@ -18,6 +18,7 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -46,7 +47,6 @@ public class MyNetService extends Service {
         //Log.i("MyNetService", "---MyNetService 启动---");
         //注册监听网络变化广播
         initNetChangeReceiver();
-        getIpDelay();
         startNotificationForeground();
         return START_STICKY;
     }
@@ -101,7 +101,7 @@ public class MyNetService extends Service {
 
                         switch (type2) {
                             case 0://移动 网络    2G 3G 4G 都是一样的
-                                if (!NetWordUtil.isMobileNetworkAvailable()) {
+                                if (NetWordUtil.isMobileNetworkAvailable()) {
                                     NetWordUtil.getLocalSavedIpToCompare(MyApp.instance);
                                 }
                                 getIpDelay();
@@ -137,7 +137,8 @@ public class MyNetService extends Service {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    if (!NetWordUtil.isMobileNetworkAvailable()) {
+                    if (NetWordUtil.isMobileNetworkAvailable()) {
+                        Log.i("ip---", "service_delay");
                         NetWordUtil.getLocalSavedIpToCompare(MyNetService.this);
                         getIpDelay();
                     }

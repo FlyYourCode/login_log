@@ -91,95 +91,97 @@ public class NetWordUtil {
 
     final static String IP_KEY = "IP_KEY";
     static String localSavedIp;
+    static long commitTime = 0;
 
     public static void getLocalSavedIpToCompare(final Context context) {
-        localSavedIp = PreferencesUtils.getString(context, IP_KEY, "");
-        NetWordUtil.validateV6(new NetWordUtil.OnGetIpResultListener() {
-            @Override
-            public void onGetIpResult(String ip) {
-                Log.i("ip", ip);
-                if (!TextUtils.isEmpty(ip)) {
-                    Intent intent = new Intent();
-                    intent.setAction("sendData");
-                    intent.putExtra("currentIp", ip.split(",")[0]);
-                    context.sendBroadcast(intent);
-                    if (!ip.equals(localSavedIp)) {
-
-                        commitNewIp(ip);
+        long current = System.currentTimeMillis();
+        if (current - commitTime >= 2000) {
+            localSavedIp = PreferencesUtils.getString(context, IP_KEY, "");
+            commitTime = current;
+            NetWordUtil.validateV6(new NetWordUtil.OnGetIpResultListener() {
+                @Override
+                public void onGetIpResult(String ip) {
+                    Log.i("ip", ip);
+                    if (!TextUtils.isEmpty(ip)) {
+                        Intent intent = new Intent();
+                        intent.setAction("sendData");
+                        intent.putExtra("currentIp", ip.split(",")[0]);
+                        context.sendBroadcast(intent);
+                        if (!ip.equals(localSavedIp)) {
+                            commitNewIp(ip);
+                        }
                     }
-                }
-            }
-        });
-    }
-
-    /**
-     * 网络已经连接，然后去判断是wifi连接还是GPRS连接
-     * 设置一些自己的逻辑调用
-     */
-    public static boolean isMobileNetworkAvailable() {
-        ConnectivityManager manager = (ConnectivityManager) MyApp.instance.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo.State mobile = manager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState();
-        return mobile == NetworkInfo.State.CONNECTED || mobile == NetworkInfo.State.CONNECTING;
-    }
-
-    private static void commitNewIp(String ip) {
-        Log.i("提交数据", ip);
-        sendRequest(ip);
-    }
-
-
-    private static void sendRequest(final String ip)   {
-        try{
-            String ipv4 = ip.split(",")[0];
-            String ipv6 = ip.split(",")[1];
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("username", MyApp.userName);
-            jsonObject.put("password", MyApp.password);
-            jsonObject.put("ipv4", ipv4);
-            jsonObject.put("ipv6", ipv6);
-            jsonObject.put("imsi", MyApp.imsi);
-            String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-            jsonObject.put("refreshTime", time);
-            String jsonData = jsonObject.toString();
-            Log.i("jsonData", jsonData);
-            String md5Key = EncryptUtil.getMd5Key(jsonData);
-            String param = EncryptUtil.encode(jsonData);
-            Log.i("md5Key",md5Key);
-            Log.i("param",param);
-            OkHttpUtils.post().url("http://192.168.110.197:5000/saveip")
-                    .addHeader("token", md5Key)
-                    .addParams("param", param).build().execute(new Callback() {
-                @Override
-                public Object parseNetworkResponse(okhttp3.Response response, int id) throws Exception {
-                    String string = response.body().string();
-                    Log.i("response",string);
-                    JSONObject jsonObject = new JSONObject(string);
-                    int code=(jsonObject.optInt("code"));
-                    String message=(jsonObject.optString("message"));
-                    String data=(jsonObject.optString("data"));
-                    if(code==200){
-                        PreferencesUtils.putString(MyApp.instance, IP_KEY, ip);
-                    }
-                    return null;
-                }
-
-                @Override
-                public void onError(okhttp3.Call call, Exception e, int id) {
-
-                }
-
-                @Override
-                public void onResponse(Object response, int id) {
-
                 }
             });
+        }
+    }
+        /**
+         * 网络已经连接，然后去判断是wifi连接还是GPRS连接
+         * 设置一些自己的逻辑调用
+         */
+        public static boolean isMobileNetworkAvailable () {
+            ConnectivityManager manager = (ConnectivityManager) MyApp.instance.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo.State mobile = manager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState();
+            return mobile == NetworkInfo.State.CONNECTED || mobile == NetworkInfo.State.CONNECTING;
+        }
 
-        }catch (Exception e){
+        private static void commitNewIp (String ip){
+            Log.i("提交数据", ip);
+            sendRequest(ip);
+        }
+
+
+        private static void sendRequest ( final String ip){
+            try {
+                String ipv4 = ip.split(",")[0];
+                String ipv6 = ip.split(",")[1];
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("username", MyApp.userName);
+                jsonObject.put("password", MyApp.password);
+                jsonObject.put("ipv4", ipv4);
+                jsonObject.put("ipv6", ipv6);
+                jsonObject.put("imsi", MyApp.imsi);
+                String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+                jsonObject.put("refreshTime", time);
+                String jsonData = jsonObject.toString();
+                Log.i("jsonData", jsonData);
+                String md5Key = EncryptUtil.getMd5Key(jsonData);
+                String param = EncryptUtil.encode(jsonData);
+                Log.i("md5Key", md5Key);
+                Log.i("param", param);
+                OkHttpUtils.post().url("http://zjslab1.minidc.cn:8910/saveip")//http://192.168.110.197:5000/saveip
+                        .addHeader("token", md5Key)
+                        .addParams("param", param).build().execute(new Callback() {
+                    @Override
+                    public Object parseNetworkResponse(okhttp3.Response response, int id) throws Exception {
+                        String string = response.body().string();
+                        Log.i("response", string);
+                        JSONObject jsonObject = new JSONObject(string);
+                        int code = (jsonObject.optInt("code"));
+                        String message = (jsonObject.optString("message"));
+                        String data = (jsonObject.optString("data"));
+                        if (code == 200) {
+                            PreferencesUtils.putString(MyApp.instance, IP_KEY, ip);
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    public void onError(okhttp3.Call call, Exception e, int id) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onResponse(Object response, int id) {
+
+                    }
+                });
+
+            } catch (Exception e) {
+
+            }
 
         }
 
+
     }
-
-
-
-}

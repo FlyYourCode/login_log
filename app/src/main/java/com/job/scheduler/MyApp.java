@@ -15,8 +15,8 @@ public class MyApp extends Application {
     public void onCreate() {
         super.onCreate();
         instance=this;
-        imsi= AppUtil.getIMSI(this);
-        Log.i("imsi",imsi);
+
+
 
     }
 }
