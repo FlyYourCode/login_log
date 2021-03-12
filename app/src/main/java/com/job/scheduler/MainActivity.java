@@ -1,22 +1,16 @@
 package com.job.scheduler;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
-import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 
 import android.content.Intent;
 import android.text.TextUtils;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -24,17 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.job.scheduler.util.AppUtil;
-import com.job.scheduler.util.EncryptUtil;
-import com.job.scheduler.util.NetWordUtil;
-
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.spec.X509EncodedKeySpec;
-
-import javax.crypto.Cipher;
 
 public class MainActivity extends AppCompatActivity {
 
